@@ -1,0 +1,81 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+'''INPUT'''
+x = np.array([1981, 1984, 1989, 1993, 1997, 2000, 2001, 2003, 2004, 2010])
+y = np.array([0.5, 8.2, 15, 22.9, 36.6, 51, 56.3, 61.8, 65, 76.7])
+'''INPUT'''
+
+
+# ANTWORT a) Ja das Polynom geht durch die Datenpunkte
+# ANTWORT b) Die Kurve hat einen komplett anderen Verlauf
+# ANTWORT c) Polynome mit solch hohem Rang sollten für Schätzwerte ausserhalb des Intervals nicht verwendet werden.
+# Zusätzlich ist der Schätzwärt für 2020 unrealistisch, weil er unter 0 liegt.
+# ANTWORT d) Sieht so aus als ob bei der Lagrange-methode ein Polynom mit zu hohem Grad entsteht und dadurch 'overfitting'
+# (es wird versucht jedes Punkt genau zu treffen) passiert.
+# Für einen Schätzwert ausserhalb der Datenpunke wäre Methode der kleinsten Quadrate wesentlich geeigneter mit dieser Anzahl an Datenpunkten.
+
+def aufg3a(x, y):
+    coeffi = np.polyfit(x, y, x.size - 1)
+    plt.figure(0)
+    x_value = np.arange(1975, 2020, 0.1)
+    plt.plot(x_value, np.polyval(coeffi, x_value))
+    plt.plot(x, y, marker='o', linewidth=0)  # points plotten
+    plt.title('Aufgabe 3a')
+    plt.xlabel('X')
+    plt.ylim(-100, 250)
+    plt.ylabel('Y')
+    plt.grid()
+    plt.show()
+
+
+def aufg3b(x, y):
+    coeffi = np.polyfit(x - x.mean(), y, x.size)
+    plt.figure(1)
+    x_value = np.arange(1975, 2020, 0.1)
+    x_value = x_value - x.mean()
+    plt.plot(x_value, np.polyval(coeffi, x_value))
+    plt.plot(x - x.mean(), y, marker='o', linewidth=0)  # points plotten
+
+    print(np.polyval(coeffi, 2020))
+    plt.title('Aufgabe 3b')
+    plt.xlabel('X')
+    plt.ylim(-100, 250)
+    plt.ylabel('Y')
+    plt.grid()
+    plt.show()
+
+
+def lagrange_intV(x, y, x_int):
+    y_int = np.zeros(len(x_int))
+    for i in range(len(x_int)):
+        lag = np.ones(len(x))
+        for k in range(len(x)):
+            for l in range(len(x)):
+                if l == k:
+                    continue;
+                lag[l] *= (x_int[i] - x[k]) / (x[l] - x[k])
+        for k in range(len(x)):
+            y_int[i] += y[k] * lag[k]
+    return y_int
+
+
+def aufg3d(x, y):
+    coeffi = np.polyfit(x, y, x.size - 1)
+    plt.figure(3)
+    plt.title('Aufgabe 3d')
+    x_value = np.arange(1975, 2020, 0.1)
+    y_lag = lagrange_intV(x, y, np.array(x_value, dtype=np.float64))
+    y_val = np.polyval(coeffi, x_value)
+    plt.scatter(x, y)
+    plt.grid()
+    plt.ylim([-100, 250])
+    plt.plot(x_value, y_lag, label="lagrange")
+    plt.plot(x_value, y_val, label="polyval")
+    plt.legend(loc="upper center")
+    plt.show()
+
+
+aufg3a(x, y)
+aufg3b(x, y)
+# aufg3d(x, y)
